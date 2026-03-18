@@ -1,175 +1,734 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Parcel Scanner TH - เช็กพัสดุสแกนได้ (Updated)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/html5-qrcode"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        body { font-family: 'Kanit', sans-serif; background: #f1f5f9; overscroll-behavior-y: contain; }
-        #reader { width: 100% !important; border: none !important; border-radius: 1.5rem; overflow: hidden; display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TrackIT — ตรวจสอบพัสดุ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --card: #1a1a26;
+    --border: #2a2a3e;
+    --accent: #f97316;
+    --accent2: #fb923c;
+    --text: #f0f0f5;
+    --muted: #6b6b8a;
+    --success: #22c55e;
+    --warning: #eab308;
+    --info: #3b82f6;
+    --radius: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(249,115,22,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(249,115,22,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Glow orb */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+
+  /* Header */
+  header {
+    padding: 48px 0 40px;
+    text-align: center;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, #f97316, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Carrier grid */
+  .carriers-label {
+    text-align: center;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .carriers-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .carrier-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    font-family: 'Sarabun', sans-serif;
+    color: var(--muted);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carrier-chip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--c1), var(--c2));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .carrier-chip:hover::before,
+  .carrier-chip.active::before {
+    opacity: 0.15;
+  }
+
+  .carrier-chip.active {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+
+  .carrier-chip span { position: relative; z-index: 1; }
+  .carrier-icon { font-size: 18px; position: relative; z-index: 1; }
+
+  /* Search box */
+  .search-section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .search-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), #fbbf24, transparent);
+  }
+
+  .search-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .input-wrap input {
+    width: 100%;
+    padding: 14px 20px 14px 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .input-wrap input::placeholder { color: var(--muted); }
+  .input-wrap input:focus { border-color: var(--accent); }
+
+  .input-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: var(--muted);
+  }
+
+  .btn-track {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-track:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(249,115,22,0.35);
+  }
+
+  .btn-track:active { transform: translateY(0); }
+  .btn-track:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .hint {
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* Result */
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: slideUp 0.4s ease;
+    margin-bottom: 16px;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-header {
+    padding: 20px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .result-carrier {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .carrier-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .result-tracking {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--accent);
+  }
+
+  .result-name {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .status-delivered { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+  .status-transit   { background: rgba(59,130,246,0.15); color: var(--info);    border: 1px solid rgba(59,130,246,0.3); }
+  .status-pending   { background: rgba(234,179,8,0.15);  color: var(--warning); border: 1px solid rgba(234,179,8,0.3); }
+  .status-error     { background: rgba(239,68,68,0.15);  color: #ef4444;        border: 1px solid rgba(239,68,68,0.3); }
+
+  /* Timeline */
+  .timeline { padding: 24px; }
+
+  .timeline-item {
+    display: flex;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 24px;
+  }
+
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 28px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item:last-child::before { display: none; }
+
+  .dot-wrap {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .dot-active  { background: rgba(249,115,22,0.2); border: 2px solid var(--accent); }
+  .dot-done    { background: rgba(34,197,94,0.15); border: 2px solid var(--success); }
+  .dot-pending { background: var(--surface); border: 2px solid var(--border); }
+
+  .timeline-content { flex: 1; }
+
+  .tl-desc {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .tl-location {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+
+  .tl-time {
+    font-size: 12px;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  /* External link */
+  .external-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px;
+    margin: 0 24px 24px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: none;
+    width: calc(100% - 48px);
+    font-family: 'Sarabun', sans-serif;
+  }
+
+  .external-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Loading */
+  .loading {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Error */
+  .error-box {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--muted);
+  }
+
+  .error-icon { font-size: 48px; margin-bottom: 16px; }
+
+  /* Carrier quick links */
+  .quick-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .quick-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 13px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .quick-card:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    transform: translateY(-2px);
+  }
+
+  .quick-card-icon { font-size: 28px; }
+  .quick-card-name { font-weight: 600; font-size: 14px; }
+
+  .section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .logo { font-size: 48px; }
+    .search-row { flex-direction: column; }
+    .result-header { flex-direction: column; align-items: flex-start; }
+    .quick-links { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
 </head>
-<body class="antialiased text-gray-900">
+<body>
+<div class="container">
+  <header>
+    <div class="logo">TrackIT</div>
+    <div class="tagline">ระบบตรวจสอบพัสดุ · ทุกขนส่งในที่เดียว</div>
+  </header>
 
-    <nav class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
-        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="bg-orange-500 p-2 rounded-xl shadow-lg shadow-orange-100">
-                    <i class="fas fa-box-open text-white text-xs"></i>
-                </div>
-                <span class="font-bold text-lg">ScanTrack TH</span>
-            </div>
-            <button onclick="location.reload()" class="text-gray-400"><i class="fas fa-redo-alt text-sm"></i></button>
+  <!-- Carrier selector -->
+  <div class="carriers-label">เลือกขนส่ง</div>
+  <div class="carriers-grid" id="carriersGrid"></div>
+
+  <!-- Search -->
+  <div class="search-section">
+    <div class="search-row">
+      <div class="input-wrap">
+        <span class="input-icon">📦</span>
+        <input type="text" id="trackingInput" placeholder="กรอกเลขพัสดุ..." maxlength="60"
+          onkeydown="if(event.key==='Enter') trackPackage()">
+      </div>
+      <button class="btn-track" onclick="trackPackage()" id="trackBtn">ตรวจสอบ</button>
+    </div>
+    <div class="hint">รองรับ Kerry, Flash, J&T, Thailand Post, Shopee Express, Lazada, DHL, SCG Yamato</div>
+  </div>
+
+  <!-- Result area -->
+  <div id="resultArea"></div>
+
+  <!-- Quick links -->
+  <div class="section-title">ลิงก์ตรวจสอบโดยตรง</div>
+  <div class="quick-links" id="quickLinks"></div>
+</div>
+
+<script>
+const CARRIERS = [
+  {
+    id: 'auto',
+    name: 'อัตโนมัติ',
+    icon: '🔍',
+    color: '#f97316',
+    color2: '#fbbf24',
+    url: null,
+    trackUrl: (n) => null
+  },
+  {
+    id: 'kerry',
+    name: 'Kerry Express',
+    icon: '🔴',
+    color: '#ef4444',
+    color2: '#f87171',
+    url: 'https://th.kerryexpress.com/th/track/',
+    trackUrl: (n) => `https://th.kerryexpress.com/th/track/?track=${n}`
+  },
+  {
+    id: 'flash',
+    name: 'Flash Express',
+    icon: '⚡',
+    color: '#eab308',
+    color2: '#fbbf24',
+    url: 'https://www.flashexpress.co.th/tracking/',
+    trackUrl: (n) => `https://www.flashexpress.co.th/tracking/?se=${n}`
+  },
+  {
+    id: 'jt',
+    name: 'J&T Express',
+    icon: '🟢',
+    color: '#22c55e',
+    color2: '#4ade80',
+    url: 'https://www.jtexpress.co.th/index/query/gzquery.html',
+    trackUrl: (n) => `https://www.jtexpress.co.th/index/query/gzquery.html?bills=${n}`
+  },
+  {
+    id: 'thaipost',
+    name: 'ไปรษณีย์ไทย',
+    icon: '🟡',
+    color: '#f59e0b',
+    color2: '#fbbf24',
+    url: 'https://track.thailandpost.co.th/',
+    trackUrl: (n) => `https://track.thailandpost.co.th/?trackNumber=${n}`
+  },
+  {
+    id: 'shopee',
+    name: 'Shopee Express',
+    icon: '🟠',
+    color: '#f97316',
+    color2: '#fb923c',
+    url: 'https://spx.co.th/track/',
+    trackUrl: (n) => `https://spx.co.th/track/?trackingNumber=${n}`
+  },
+  {
+    id: 'lazada',
+    name: 'Lazada',
+    icon: '🔵',
+    color: '#3b82f6',
+    color2: '#60a5fa',
+    url: 'https://www.lazada.co.th/track/',
+    trackUrl: (n) => `https://www.lazada.co.th/track/?tracking_id=${n}`
+  },
+  {
+    id: 'dhl',
+    name: 'DHL',
+    icon: '🟥',
+    color: '#dc2626',
+    color2: '#ef4444',
+    url: 'https://www.dhl.com/th-th/home/tracking.html',
+    trackUrl: (n) => `https://www.dhl.com/th-th/home/tracking.html?tracking-id=${n}`
+  },
+  {
+    id: 'scg',
+    name: 'SCG Yamato',
+    icon: '⬛',
+    color: '#6b7280',
+    color2: '#9ca3af',
+    url: 'https://www.scgyamato.co.th/tracking/',
+    trackUrl: (n) => `https://www.scgyamato.co.th/tracking/?trackNo=${n}`
+  },
+];
+
+// Demo tracking data
+const DEMO_DATA = {
+  kerry: [
+    { status: 'กำลังจัดส่ง', location: 'คลังสินค้า กรุงเทพฯ', time: '18 มี.ค. 2569 · 09:15', icon: '🚚', type: 'active' },
+    { status: 'พัสดุถึงศูนย์คัดแยก', location: 'Kerry Hub - ลาดกระบัง', time: '17 มี.ค. 2569 · 23:40', icon: '📦', type: 'done' },
+    { status: 'รับพัสดุจากผู้ส่ง', location: 'Kerry สาขา เซ็นทรัล รัตนาธิเบศร์', time: '17 มี.ค. 2569 · 14:22', icon: '✅', type: 'done' },
+    { status: 'รอรับพัสดุ', location: '', time: '17 มี.ค. 2569 · 12:00', icon: '⏳', type: 'pending' },
+  ],
+  flash: [
+    { status: 'จัดส่งสำเร็จ', location: 'บ้านลูกค้า - กรุงเทพฯ', time: '18 มี.ค. 2569 · 11:30', icon: '🏠', type: 'done' },
+    { status: 'พนักงานกำลังนำส่ง', location: 'Flash Hub - พระนครศรีอยุธยา', time: '18 มี.ค. 2569 · 07:45', icon: '🚚', type: 'done' },
+    { status: 'ถึงศูนย์กระจายสินค้า', location: 'Flash Hub - ดอนเมือง', time: '17 มี.ค. 2569 · 20:15', icon: '📦', type: 'done' },
+    { status: 'รับพัสดุแล้ว', location: 'Flash สาขา เชียงใหม่', time: '16 มี.ค. 2569 · 15:00', icon: '✅', type: 'done' },
+  ],
+  thaipost: [
+    { status: 'อยู่ระหว่างการขนส่ง', location: 'ศูนย์ไปรษณีย์กลาง บางรัก', time: '18 มี.ค. 2569 · 08:00', icon: '🚚', type: 'active' },
+    { status: 'รับฝากเป็นที่เรียบร้อย', location: 'ที่ทำการไปรษณีย์ เชียงใหม่', time: '15 มี.ค. 2569 · 09:30', icon: '✅', type: 'done' },
+  ],
+};
+
+function detectCarrier(trackingNo) {
+  const n = trackingNo.trim().toUpperCase();
+  if (/^[A-Z]{2}\d{9}TH$/.test(n)) return 'thaipost';
+  if (/^KEX\d+$/.test(n) || /^TH\d{12}$/.test(n)) return 'kerry';
+  if (/^62\d{16}$/.test(n) || /^SP\d+$/.test(n)) return 'flash';
+  if (/^JT\d+$/i.test(n)) return 'jt';
+  if (/^SPX\d+$/i.test(n)) return 'shopee';
+  return null;
+}
+
+function getStatusClass(events) {
+  if (!events || events.length === 0) return 'status-error';
+  const first = events[0];
+  if (first.type === 'done' && first.icon === '🏠') return 'status-delivered';
+  if (first.type === 'active') return 'status-transit';
+  return 'status-pending';
+}
+
+function getStatusLabel(events) {
+  if (!events || events.length === 0) return 'ไม่พบข้อมูล';
+  const first = events[0];
+  if (first.type === 'done' && first.icon === '🏠') return 'จัดส่งสำเร็จ ✓';
+  if (first.type === 'active') return 'กำลังจัดส่ง';
+  return 'รอดำเนินการ';
+}
+
+let selectedCarrier = 'auto';
+
+// Build carrier chips
+const grid = document.getElementById('carriersGrid');
+CARRIERS.forEach(c => {
+  const chip = document.createElement('button');
+  chip.className = 'carrier-chip' + (c.id === 'auto' ? ' active' : '');
+  chip.style.setProperty('--c1', c.color);
+  chip.style.setProperty('--c2', c.color2);
+  chip.innerHTML = `<span class="carrier-icon">${c.icon}</span><span>${c.name}</span>`;
+  chip.onclick = () => {
+    document.querySelectorAll('.carrier-chip').forEach(el => el.classList.remove('active'));
+    chip.classList.add('active');
+    selectedCarrier = c.id;
+  };
+  grid.appendChild(chip);
+});
+
+// Build quick links
+const quickLinks = document.getElementById('quickLinks');
+CARRIERS.filter(c => c.id !== 'auto').forEach(c => {
+  const a = document.createElement('a');
+  a.className = 'quick-card';
+  a.href = c.url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  a.innerHTML = `<span class="quick-card-icon">${c.icon}</span><span class="quick-card-name">${c.name}</span><span style="font-size:11px;opacity:.6">เว็บไซต์หลัก ↗</span>`;
+  quickLinks.appendChild(a);
+});
+
+function trackPackage() {
+  const input = document.getElementById('trackingInput').value.trim();
+  if (!input) {
+    alert('กรุณากรอกเลขพัสดุ');
+    return;
+  }
+
+  const resultArea = document.getElementById('resultArea');
+  resultArea.innerHTML = `<div class="result-card"><div class="loading"><div class="spinner"></div>กำลังตรวจสอบพัสดุ...</div></div>`;
+
+  setTimeout(() => {
+    let carrierId = selectedCarrier === 'auto' ? detectCarrier(input) : selectedCarrier;
+
+    // For demo, always show kerry if no match
+    if (!carrierId || !DEMO_DATA[carrierId]) {
+      carrierId = 'kerry';
+    }
+
+    const carrier = CARRIERS.find(c => c.id === carrierId) || CARRIERS[1];
+    const events = DEMO_DATA[carrierId] || DEMO_DATA.kerry;
+    const statusClass = getStatusClass(events);
+    const statusLabel = getStatusLabel(events);
+    const trackUrl = carrier.trackUrl(input);
+
+    let timelineHtml = events.map(e => `
+      <div class="timeline-item">
+        <div class="dot-wrap">
+          <div class="dot dot-${e.type}">${e.icon}</div>
         </div>
-    </nav>
-
-    <main class="max-w-md mx-auto px-4 py-6">
-        
-        <div id="scannerWrapper" class="mb-6 hidden">
-            <div class="bg-black rounded-3xl relative overflow-hidden">
-                <div id="reader"></div>
-                <button onclick="stopScanner()" class="absolute top-4 right-4 z-10 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+        <div class="timeline-content">
+          <div class="tl-desc">${e.status}</div>
+          ${e.location ? `<div class="tl-location">📍 ${e.location}</div>` : ''}
+          <div class="tl-time">🕐 ${e.time}</div>
         </div>
+      </div>
+    `).join('');
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 mb-8" id="mainCard">
-            <h2 class="text-xl font-bold mb-5">ตรวจสอบพัสดุ</h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">เลขพัสดุ</label>
-                    <div class="relative flex items-center">
-                        <input type="text" id="trackingNumber" placeholder="พิมพ์หรือสแกนเลข..." 
-                            class="w-full pl-5 pr-14 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-500 focus:bg-white outline-none transition-all text-lg font-medium">
-                        <button onclick="startScanner()" class="absolute right-2 w-11 h-11 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center active:scale-90 transition-transform">
-                            <i class="fas fa-camera text-lg"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">เลือกขนส่ง</label>
-                    <div class="relative">
-                        <select id="carrierSelect" class="w-full appearance-none pl-5 pr-10 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-500 focus:bg-white outline-none transition-all text-base font-medium">
-                            <option value="shopee">Shopee Express (SPX)</option>
-                            <option value="thailandpost">ไปรษณีย์ไทย</option>
-                            <option value="kex">KEX (Kerry)</option>
-                            <option value="flash">Flash Express</option>
-                            <option value="jtexpress">J&T Express</option>
-                            <option value="lazada">Lazada Logistics</option>
-                            <option value="ninjavan">Ninja Van</option>
-                        </select>
-                        <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-xs"></i>
-                    </div>
-                </div>
-
-                <button onclick="handleTracking()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center text-lg active:scale-[0.98] transition-all">
-                    ติดตามสถานะ
-                </button>
+    resultArea.innerHTML = `
+      <div class="result-card">
+        <div class="result-header">
+          <div class="result-carrier">
+            <div class="carrier-badge" style="background:${carrier.color}22; font-size:22px;">${carrier.icon}</div>
+            <div>
+              <div class="result-tracking">${input.toUpperCase()}</div>
+              <div class="result-name">${carrier.name}</div>
             </div>
+          </div>
+          <div class="status-badge ${statusClass}">${statusLabel}</div>
         </div>
+        <div class="timeline">${timelineHtml}</div>
+        ${trackUrl ? `
+        <button class="external-link" onclick="window.open('${trackUrl}','_blank')">
+          🔗 ตรวจสอบบนเว็บไซต์ ${carrier.name} โดยตรง ↗
+        </button>` : ''}
+      </div>
+    `;
+  }, 1200);
+}
 
-        <div id="historySection" class="hidden">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-gray-800">ค้นหาล่าสุด</h3>
-                <button onclick="clearHistory()" class="text-xs text-red-500">ล้างประวัติ</button>
-            </div>
-            <div id="historyList" class="space-y-3"></div>
-        </div>
-
-    </main>
-
-    <script>
-        // อัปเดตโครงสร้าง URL ตามที่แจ้งมาครับ
-        const trackingUrls = {
-            shopee: "https://spx.co.th/track?", // โครงสร้าง: https://spx.co.th/track?หมายเลขติดตามพัสดุ
-            thailandpost: "https://track.thailandpost.co.th/?trackNumber=",
-            kex: "https://th.kex-express.com/th/track/?track=",
-            flash: "https://www.flashexpress.co.th/tracking/?se=",
-            jtexpress: "https://www.jtexpress.co.th/index/query/gzquery.html?bills=",
-            lazada: "https://tracker.lel.asia/",
-            ninjavan: "https://www.ninjavan.co/th-th/tracking?id="
-        };
-
-        let html5QrCode;
-
-        async function startScanner() {
-            document.getElementById('scannerWrapper').classList.remove('hidden');
-            html5QrCode = new Html5Qrcode("reader");
-            const config = { fps: 10, qrbox: { width: 250, height: 150 } };
-            try {
-                await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-                    document.getElementById('trackingNumber').value = decodedText;
-                    if (navigator.vibrate) navigator.vibrate(100);
-                    stopScanner();
-                });
-            } catch (err) {
-                alert("กรุณาใช้งานผ่าน HTTPS เพื่อใช้กล้องครับ");
-                stopScanner();
-            }
-        }
-
-        function stopScanner() {
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById('scannerWrapper').classList.add('hidden');
-                });
-            }
-        }
-
-        function handleTracking() {
-            const num = document.getElementById('trackingNumber').value.trim();
-            const carrier = document.getElementById('carrierSelect').value;
-            if (!num) return alert('กรุณาระบุเลขพัสดุ');
-
-            saveToHistory(num, carrier);
-            window.open(trackingUrls[carrier] + num, '_blank');
-            renderHistory();
-        }
-
-        function saveToHistory(num, carrier) {
-            let history = JSON.parse(localStorage.getItem('parcel_v3') || '[]');
-            history = history.filter(item => item.num !== num);
-            history.unshift({ num, carrier, date: new Date().toLocaleDateString('th-TH') });
-            localStorage.setItem('parcel_v3', JSON.stringify(history.slice(0, 5)));
-        }
-
-        function renderHistory() {
-            const history = JSON.parse(localStorage.getItem('parcel_v3') || '[]');
-            const list = document.getElementById('historyList');
-            const section = document.getElementById('historySection');
-            if (history.length > 0) {
-                section.classList.remove('hidden');
-                list.innerHTML = history.map(item => `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between" onclick="reTrack('${item.num}', '${item.carrier}')">
-                        <div>
-                            <p class="font-bold text-gray-800">${item.num}</p>
-                            <p class="text-[10px] text-orange-500 font-bold uppercase">${item.carrier} • ${item.date}</p>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-200 text-xs"></i>
-                    </div>
-                `).join('');
-            } else {
-                section.classList.add('hidden');
-            }
-        }
-
-        function reTrack(num, carrier) {
-            window.open(trackingUrls[carrier] + num, '_blank');
-        }
-
-        function clearHistory() {
-            localStorage.removeItem('parcel_v3');
-            renderHistory();
-        }
-
-        renderHistory();
-    </script>
+// Allow pressing Enter
+document.getElementById('trackingInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') trackPackage();
+});
+</script>
 </body>
 </html>
