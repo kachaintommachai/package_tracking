@@ -3,19 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Parcel Scanner TH - เช็กพัสดุสแกนได้</title>
+    <title>Parcel Scanner TH - เช็กพัสดุสแกนได้ (Updated)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         body { font-family: 'Kanit', sans-serif; background: #f1f5f9; overscroll-behavior-y: contain; }
-        .scanner-active #reader { display: block !important; }
         #reader { width: 100% !important; border: none !important; border-radius: 1.5rem; overflow: hidden; display: none; }
-        #reader__dashboard { padding: 10px !important; }
-        button#reader__dashboard_section_csr_button { 
-            background: #2563eb !important; color: white !important; border-radius: 0.5rem !important; padding: 8px 15px !important;
-        }
     </style>
 </head>
 <body class="antialiased text-gray-900">
@@ -23,116 +18,99 @@
     <nav class="bg-white/80 backdrop-blur-md border-b sticky top-0 z-50">
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-2">
-                <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-200">
-                    <i class="fas fa-expand text-white text-xs"></i>
+                <div class="bg-orange-500 p-2 rounded-xl shadow-lg shadow-orange-100">
+                    <i class="fas fa-box-open text-white text-xs"></i>
                 </div>
                 <span class="font-bold text-lg">ScanTrack TH</span>
             </div>
-            <div class="flex gap-4 text-gray-400">
-                <i class="fas fa-bell text-sm"></i>
-                <i class="fas fa-cog text-sm"></i>
-            </div>
+            <button onclick="location.reload()" class="text-gray-400"><i class="fas fa-redo-alt text-sm"></i></button>
         </div>
     </nav>
 
     <main class="max-w-md mx-auto px-4 py-6">
         
         <div id="scannerWrapper" class="mb-6 hidden">
-            <div class="bg-black rounded-3 shadow-2xl relative overflow-hidden">
+            <div class="bg-black rounded-3xl relative overflow-hidden">
                 <div id="reader"></div>
                 <button onclick="stopScanner()" class="absolute top-4 right-4 z-10 bg-white/20 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <p class="text-center text-sm text-gray-500 mt-2 italic">วางบาร์โค้ดให้อยู่ในกรอบเพื่อสแกน</p>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 mb-8 transition-all" id="mainCard">
-            <h2 class="text-xl font-bold mb-5">ติดตามพัสดุ</h2>
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-6 mb-8" id="mainCard">
+            <h2 class="text-xl font-bold mb-5">ตรวจสอบพัสดุ</h2>
             
             <div class="space-y-4">
                 <div>
                     <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">เลขพัสดุ</label>
                     <div class="relative flex items-center">
                         <input type="text" id="trackingNumber" placeholder="พิมพ์หรือสแกนเลข..." 
-                            class="w-full pl-5 pr-14 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none transition-all text-lg font-medium">
-                        <button onclick="startScanner()" class="absolute right-2 w-11 h-11 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center active:scale-90 transition-transform">
+                            class="w-full pl-5 pr-14 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-500 focus:bg-white outline-none transition-all text-lg font-medium">
+                        <button onclick="startScanner()" class="absolute right-2 w-11 h-11 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center active:scale-90 transition-transform">
                             <i class="fas fa-camera text-lg"></i>
                         </button>
                     </div>
                 </div>
 
                 <div>
-                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">ขนส่ง</label>
+                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">เลือกขนส่ง</label>
                     <div class="relative">
-                        <select id="carrierSelect" class="w-full appearance-none pl-5 pr-10 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none transition-all text-base font-medium">
+                        <select id="carrierSelect" class="w-full appearance-none pl-5 pr-10 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-orange-500 focus:bg-white outline-none transition-all text-base font-medium">
+                            <option value="shopee">Shopee Express (SPX)</option>
                             <option value="thailandpost">ไปรษณีย์ไทย</option>
                             <option value="kex">KEX (Kerry)</option>
                             <option value="flash">Flash Express</option>
                             <option value="jtexpress">J&T Express</option>
-                            <option value="shopee">Shopee Express</option>
                             <option value="lazada">Lazada Logistics</option>
                             <option value="ninjavan">Ninja Van</option>
-                            <option value="best">Best Express</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-300 pointer-events-none text-xs"></i>
                     </div>
                 </div>
 
-                <button onclick="handleTracking()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-100 flex items-center justify-center text-lg active:scale-[0.98] transition-all">
-                    ตรวจสอบสถานะ
+                <button onclick="handleTracking()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-orange-100 flex items-center justify-center text-lg active:scale-[0.98] transition-all">
+                    ติดตามสถานะ
                 </button>
             </div>
         </div>
 
         <div id="historySection" class="hidden">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-gray-800">ประวัติล่าสุด</h3>
-                <button onclick="clearHistory()" class="text-xs text-red-500">ล้าง</button>
+                <h3 class="font-bold text-gray-800">ค้นหาล่าสุด</h3>
+                <button onclick="clearHistory()" class="text-xs text-red-500">ล้างประวัติ</button>
             </div>
             <div id="historyList" class="space-y-3"></div>
         </div>
 
     </main>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium opacity-0 transition-opacity pointer-events-none z-[100]"></div>
-
     <script>
+        // อัปเดตโครงสร้าง URL ตามที่แจ้งมาครับ
         const trackingUrls = {
+            shopee: "https://spx.co.th/track?", // โครงสร้าง: https://spx.co.th/track?หมายเลขติดตามพัสดุ
             thailandpost: "https://track.thailandpost.co.th/?trackNumber=",
             kex: "https://th.kex-express.com/th/track/?track=",
             flash: "https://www.flashexpress.co.th/tracking/?se=",
             jtexpress: "https://www.jtexpress.co.th/index/query/gzquery.html?bills=",
-            shopee: "https://spx.co.th/m/track/",
             lazada: "https://tracker.lel.asia/",
-            ninjavan: "https://www.ninjavan.co/th-th/tracking?id=",
-            best: "https://www.best-inc.co.th/track?bills="
+            ninjavan: "https://www.ninjavan.co/th-th/tracking?id="
         };
 
         let html5QrCode;
 
-        // --- ระบบ Scanner ---
         async function startScanner() {
             document.getElementById('scannerWrapper').classList.remove('hidden');
-            document.getElementById('mainCard').classList.add('opacity-50');
-            
             html5QrCode = new Html5Qrcode("reader");
             const config = { fps: 10, qrbox: { width: 250, height: 150 } };
-
             try {
-                await html5QrCode.start(
-                    { facingMode: "environment" }, 
-                    config,
-                    (decodedText) => {
-                        // เมื่อสแกนติด
-                        document.getElementById('trackingNumber').value = decodedText;
-                        showToast("สแกนสำเร็จ!");
-                        if (navigator.vibrate) navigator.vibrate(100);
-                        stopScanner();
-                    }
-                );
+                await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                    document.getElementById('trackingNumber').value = decodedText;
+                    if (navigator.vibrate) navigator.vibrate(100);
+                    stopScanner();
+                });
             } catch (err) {
-                alert("ไม่สามารถเข้าถึงกล้องได้: " + err);
+                alert("กรุณาใช้งานผ่าน HTTPS เพื่อใช้กล้องครับ");
                 stopScanner();
             }
         }
@@ -141,20 +119,14 @@
             if (html5QrCode) {
                 html5QrCode.stop().then(() => {
                     document.getElementById('scannerWrapper').classList.add('hidden');
-                    document.getElementById('mainCard').classList.remove('opacity-50');
                 });
             }
         }
 
-        // --- ระบบ Logic หลัก ---
         function handleTracking() {
             const num = document.getElementById('trackingNumber').value.trim();
             const carrier = document.getElementById('carrierSelect').value;
-
-            if (!num) {
-                showToast("กรุณากรอกเลขพัสดุ");
-                return;
-            }
+            if (!num) return alert('กรุณาระบุเลขพัสดุ');
 
             saveToHistory(num, carrier);
             window.open(trackingUrls[carrier] + num, '_blank');
@@ -162,26 +134,25 @@
         }
 
         function saveToHistory(num, carrier) {
-            let history = JSON.parse(localStorage.getItem('parcel_ocr_v1') || '[]');
+            let history = JSON.parse(localStorage.getItem('parcel_v3') || '[]');
             history = history.filter(item => item.num !== num);
             history.unshift({ num, carrier, date: new Date().toLocaleDateString('th-TH') });
-            localStorage.setItem('parcel_ocr_v1', JSON.stringify(history.slice(0, 5)));
+            localStorage.setItem('parcel_v3', JSON.stringify(history.slice(0, 5)));
         }
 
         function renderHistory() {
-            const history = JSON.parse(localStorage.getItem('parcel_ocr_v1') || '[]');
+            const history = JSON.parse(localStorage.getItem('parcel_v3') || '[]');
             const list = document.getElementById('historyList');
             const section = document.getElementById('historySection');
-
             if (history.length > 0) {
                 section.classList.remove('hidden');
                 list.innerHTML = history.map(item => `
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between" onclick="reTrack('${item.num}', '${item.carrier}')">
                         <div>
                             <p class="font-bold text-gray-800">${item.num}</p>
-                            <p class="text-[10px] text-indigo-500 font-bold uppercase">${item.carrier} • ${item.date}</p>
+                            <p class="text-[10px] text-orange-500 font-bold uppercase">${item.carrier} • ${item.date}</p>
                         </div>
-                        <i class="fas fa-chevron-right text-gray-200"></i>
+                        <i class="fas fa-chevron-right text-gray-200 text-xs"></i>
                     </div>
                 `).join('');
             } else {
@@ -193,15 +164,8 @@
             window.open(trackingUrls[carrier] + num, '_blank');
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.style.opacity = '1';
-            setTimeout(() => toast.style.opacity = '0', 2000);
-        }
-
         function clearHistory() {
-            localStorage.removeItem('parcel_ocr_v1');
+            localStorage.removeItem('parcel_v3');
             renderHistory();
         }
 
