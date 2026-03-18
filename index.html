@@ -613,11 +613,33 @@ const DEMO_DATA = {
 
 function detectCarrier(trackingNo) {
   const n = trackingNo.trim().toUpperCase();
+
+  // ไปรษณีย์ไทย: EF123456789TH, RH123456789TH ฯลฯ
   if (/^[A-Z]{2}\d{9}TH$/.test(n)) return 'thaipost';
-  if (/^KEX\d+$/.test(n) || /^TH\d{12}$/.test(n)) return 'kerry';
-  if (/^62\d{16}$/.test(n) || /^SP\d+$/.test(n)) return 'flash';
-  if (/^JT\d+$/i.test(n)) return 'jt';
-  if (/^SPX\d+$/i.test(n)) return 'shopee';
+
+  // Shopee Express — เช็คก่อน Kerry เพราะบาง pattern ขึ้นต้น TH เหมือนกัน
+  if (/^SPXTH\d+$/.test(n)) return 'shopee';
+  if (/^SPX\d+$/.test(n)) return 'shopee';
+  if (/^SHOP\d+$/.test(n)) return 'shopee';
+  if (/^TH\d{18,22}$/.test(n)) return 'shopee';
+  if (/^SH\d{15,20}$/.test(n)) return 'shopee';
+
+  // Kerry: KEXTH..., TH + 12 หลัก
+  if (/^KEX\d+$/.test(n) || /^KEXTH\d+$/.test(n)) return 'kerry';
+  if (/^TH\d{12}$/.test(n)) return 'kerry';
+
+  // Flash Express: 62...(18 หลัก), TF...
+  if (/^62\d{16}$/.test(n)) return 'flash';
+  if (/^TF\d+$/.test(n)) return 'flash';
+
+  // J&T Express: JT..., 600...
+  if (/^JT\d+$/.test(n)) return 'jt';
+  if (/^600\d{15}$/.test(n)) return 'jt';
+
+  // DHL: 1Z..., JD...
+  if (/^1Z[A-Z0-9]{16}$/.test(n)) return 'dhl';
+  if (/^JD\d{18}$/.test(n)) return 'dhl';
+
   return null;
 }
 
