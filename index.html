@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="th" data-theme="light" data-font="normal">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,26 +9,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --card: #1a1a26;
-    --border: #2a2a3e;
-    --accent: #f97316;
-    --accent2: #fb923c;
-    --text: #f0f0f5;
-    --muted: #6b6b8a;
-    --success: #22c55e;
-    --warning: #eab308;
-    --info: #3b82f6;
+    --bg: #eef2f7;
+    --surface: #f8fafc;
+    --card: #ffffff;
+    --border: #dde5ef;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --text: #1e293b;
+    --muted: #94a3b8;
+    --success: #16a34a;
+    --warning: #d97706;
+    --info: #0ea5e9;
     --radius: 16px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Font scale — set on <html> so rem cascade works everywhere */
+  html[data-font="normal"] { font-size: 17px; }
+  html[data-font="large"]  { font-size: 20px; }
+  html[data-font="xlarge"] { font-size: 23px; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'Sarabun', sans-serif;
+    line-height: 1.7;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -39,8 +44,8 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(249,115,22,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(249,115,22,0.04) 1px, transparent 1px);
+      linear-gradient(rgba(59,130,246,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.07) 1px, transparent 1px);
     background-size: 60px 60px;
     pointer-events: none;
     z-index: 0;
@@ -55,7 +60,7 @@
     transform: translateX(-50%);
     width: 700px;
     height: 400px;
-    background: radial-gradient(ellipse, rgba(249,115,22,0.12) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(59,130,246,0.10) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
@@ -76,9 +81,9 @@
 
   .logo {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
+    font-size: 4rem;
     letter-spacing: 4px;
-    background: linear-gradient(135deg, #f97316, #fbbf24);
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -88,16 +93,16 @@
 
   .tagline {
     color: var(--muted);
-    font-size: 15px;
-    font-weight: 300;
-    letter-spacing: 2px;
+    font-size: 1.05rem;
+    font-weight: 400;
+    letter-spacing: 1px;
     text-transform: uppercase;
   }
 
   /* Carrier grid */
   .carriers-label {
     text-align: center;
-    font-size: 12px;
+    font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 3px;
     color: var(--muted);
@@ -116,13 +121,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 12px 20px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.2s;
-    font-size: 13px;
+    font-size: 0.95rem;
     font-family: 'Sarabun', sans-serif;
     color: var(--muted);
     position: relative;
@@ -149,7 +154,7 @@
   }
 
   .carrier-chip span { position: relative; z-index: 1; }
-  .carrier-icon { font-size: 18px; position: relative; z-index: 1; }
+  .carrier-icon { font-size: 1.3rem; position: relative; z-index: 1; }
 
   /* Search box */
   .search-section {
@@ -160,6 +165,7 @@
     margin-bottom: 32px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   }
 
   .search-section::before {
@@ -167,7 +173,7 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--accent), #fbbf24, transparent);
+    background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
   }
 
   .search-row {
@@ -182,13 +188,13 @@
 
   .input-wrap input {
     width: 100%;
-    padding: 14px 20px 14px 48px;
+    padding: 17px 20px 17px 52px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
     color: var(--text);
     font-family: 'Sarabun', sans-serif;
-    font-size: 15px;
+    font-size: 1.05rem;
     outline: none;
     transition: border-color 0.2s;
     letter-spacing: 0.5px;
@@ -202,18 +208,18 @@
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 18px;
+    font-size: 1.05rem;
     color: var(--muted);
   }
 
   .btn-track {
-    padding: 14px 28px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    padding: 17px 32px;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa);
     border: none;
     border-radius: 12px;
     color: white;
     font-family: 'Sarabun', sans-serif;
-    font-size: 15px;
+    font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
@@ -223,7 +229,7 @@
 
   .btn-track:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(249,115,22,0.35);
+    box-shadow: 0 8px 24px rgba(59,130,246,0.30);
   }
 
   .btn-track:active { transform: translateY(0); }
@@ -231,7 +237,7 @@
 
   .hint {
     margin-top: 12px;
-    font-size: 12px;
+    font-size: 0.9rem;
     color: var(--muted);
     text-align: center;
   }
@@ -244,6 +250,7 @@
     overflow: hidden;
     animation: slideUp 0.4s ease;
     margin-bottom: 16px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   }
 
   @keyframes slideUp {
@@ -275,19 +282,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 1.2rem;
     flex-shrink: 0;
   }
 
   .result-tracking {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
+    font-size: 1.55rem;
     letter-spacing: 2px;
     color: var(--accent);
   }
 
   .result-name {
-    font-size: 13px;
+    font-size: 0.95rem;
     color: var(--muted);
     margin-top: 2px;
   }
@@ -295,7 +302,7 @@
   .status-badge {
     padding: 6px 14px;
     border-radius: 100px;
-    font-size: 13px;
+    font-size: 0.95rem;
     font-weight: 600;
   }
 
@@ -319,8 +326,8 @@
   .timeline-item::before {
     content: '';
     position: absolute;
-    left: 15px;
-    top: 28px;
+    left: 19px;
+    top: 36px;
     bottom: 0;
     width: 2px;
     background: var(--border);
@@ -330,20 +337,20 @@
 
   .dot-wrap {
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     position: relative;
     z-index: 1;
   }
 
   .dot {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
+    font-size: 1.05rem;
   }
 
   .dot-active  { background: rgba(249,115,22,0.2); border: 2px solid var(--accent); }
@@ -353,20 +360,20 @@
   .timeline-content { flex: 1; }
 
   .tl-desc {
-    font-size: 15px;
+    font-size: 1.05rem;
     font-weight: 600;
     margin-bottom: 4px;
     color: var(--text);
   }
 
   .tl-location {
-    font-size: 13px;
+    font-size: 0.95rem;
     color: var(--muted);
     margin-bottom: 3px;
   }
 
   .tl-time {
-    font-size: 12px;
+    font-size: 0.9rem;
     color: var(--muted);
     opacity: 0.7;
   }
@@ -382,7 +389,7 @@
     border: 1px dashed var(--border);
     border-radius: 12px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 0.78rem;
     text-decoration: none;
     transition: all 0.2s;
     cursor: pointer;
@@ -422,7 +429,7 @@
     color: var(--muted);
   }
 
-  .error-icon { font-size: 48px; margin-bottom: 16px; }
+  .error-icon { font-size: 2.8rem; margin-bottom: 16px; }
 
   /* Carrier quick links */
   .quick-links {
@@ -440,7 +447,7 @@
     text-align: center;
     text-decoration: none;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 0.9rem;
     transition: all 0.2s;
     display: flex;
     flex-direction: column;
@@ -454,11 +461,11 @@
     transform: translateY(-2px);
   }
 
-  .quick-card-icon { font-size: 28px; }
-  .quick-card-name { font-weight: 600; font-size: 14px; }
+  .quick-card-icon { font-size: 1.65rem; }
+  .quick-card-name { font-weight: 600; font-size: 1rem; }
 
   .section-title {
-    font-size: 12px;
+    font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 3px;
     color: var(--muted);
@@ -476,7 +483,7 @@
     border-radius: 12px;
     color: var(--text);
     font-family: 'Sarabun', sans-serif;
-    font-size: 14px;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
     width: 100%;
@@ -488,11 +495,68 @@
     transform: translateX(4px);
   }
   .multi-name { flex: 1; font-weight: 600; }
-  .multi-arrow { color: var(--muted); font-size: 16px; }
+  .multi-arrow { color: var(--muted); font-size: 0.95rem; }
+
+  /* Dark theme */
+  [data-theme="dark"] {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --card: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #7d8590;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 0 0;
+    flex-wrap: wrap;
+  }
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .toolbar-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding: 0 8px;
+    white-space: nowrap;
+  }
+  .tb-btn {
+    border: none;
+    background: transparent;
+    border-radius: 100px;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: 'Sarabun', sans-serif;
+    font-weight: 600;
+    transition: all 0.18s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tb-btn:hover { background: var(--border); color: var(--text); }
+  .tb-btn.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .tb-btn-font { font-size: 0.78rem; padding: 6px 12px; }
+  .tb-btn-theme { font-size: 1.05rem; padding: 5px 9px; }
 
   /* Responsive */
   @media (max-width: 600px) {
-    .logo { font-size: 48px; }
+    .logo { font-size: 2.8rem; }
     .search-row { flex-direction: column; }
     .result-header { flex-direction: column; align-items: flex-start; }
     .quick-links { grid-template-columns: repeat(2, 1fr); }
@@ -502,6 +566,18 @@
 <body>
 <div class="container">
   <header>
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <span class="toolbar-label">ขนาดตัวอักษร</span>
+        <button class="tb-btn tb-btn-font active" id="fontNormal" onclick="setFont('normal')" title="ปกติ">ก</button>
+        <button class="tb-btn tb-btn-font" id="fontLarge" onclick="setFont('large')" title="ใหญ่" style="font-size:0.95rem">ก</button>
+        <button class="tb-btn tb-btn-font" id="fontXlarge" onclick="setFont('xlarge')" title="ใหญ่มาก" style="font-size:1.2rem">ก</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="tb-btn tb-btn-theme active" id="btnLight" onclick="setTheme('light')" title="สว่าง">☀️</button>
+        <button class="tb-btn tb-btn-theme" id="btnDark" onclick="setTheme('dark')" title="มืด">🌙</button>
+      </div>
+    </div>
     <div class="logo">TrackIT</div>
     <div class="tagline">ระบบตรวจสอบพัสดุ · ทุกขนส่งในที่เดียว</div>
   </header>
@@ -735,7 +811,7 @@ CARRIERS.filter(c => c.id !== 'auto').forEach(c => {
   a.href = c.url;
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
-  a.innerHTML = `<span class="quick-card-icon">${c.icon}</span><span class="quick-card-name">${c.name}</span><span style="font-size:11px;opacity:.6">เว็บไซต์หลัก ↗</span>`;
+  a.innerHTML = `<span class="quick-card-icon">${c.icon}</span><span class="quick-card-name">${c.name}</span><span style="font-size:0.68rem;opacity:.6">เว็บไซต์หลัก ↗</span>`;
   quickLinks.appendChild(a);
 });
 
@@ -753,7 +829,7 @@ function trackPackage() {
   if (!carrier || !carrier.trackUrl) {
     const allLinks = CARRIERS.filter(c => c.id !== 'auto').map(c => `
       <button class="multi-btn" onclick="window.open('${c.trackUrl(input)}','_blank')" style="--cc:${c.color}">
-        <span style="font-size:20px">${c.icon}</span>
+        <span style="font-size:1.2rem">${c.icon}</span>
         <span class="multi-name">${c.name}</span>
         <span class="multi-arrow">↗</span>
       </button>
@@ -792,7 +868,7 @@ function trackPackage() {
         <div class="status-badge status-transit">กำลังเปิดเว็บไซต์...</div>
       </div>
       <div style="padding:24px;text-align:center;color:var(--muted)">
-        <div style="font-size:40px;margin-bottom:12px">🚀</div>
+        <div style="font-size:2.4rem;margin-bottom:12px">🚀</div>
         <div style="font-size:15px;color:var(--text);margin-bottom:6px">กำลังพาไปยังเว็บไซต์ <strong>${carrier.name}</strong></div>
         <div style="font-size:13px;margin-bottom:20px">หากหน้าต่างไม่เปิดอัตโนมัติ กดปุ่มด้านล่าง</div>
         <button class="btn-track" onclick="window.open('${trackUrl}','_blank')">
@@ -808,6 +884,29 @@ function trackPackage() {
 document.getElementById('trackingInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') trackPackage();
 });
+
+function setFont(size) {
+  document.documentElement.setAttribute('data-font', size);
+  ['Normal','Large','Xlarge'].forEach(s => {
+    document.getElementById('font'+s).classList.toggle('active', s.toLowerCase() === size);
+  });
+  localStorage.setItem('trackit-font', size);
+}
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  document.getElementById('btnLight').classList.toggle('active', theme === 'light');
+  document.getElementById('btnDark').classList.toggle('active', theme === 'dark');
+  localStorage.setItem('trackit-theme', theme);
+}
+
+// Restore saved prefs
+(function() {
+  const savedFont  = localStorage.getItem('trackit-font')  || 'normal';
+  const savedTheme = localStorage.getItem('trackit-theme') || 'light';
+  if (savedFont  !== 'normal') setFont(savedFont);
+  if (savedTheme !== 'light')  setTheme(savedTheme);
+})();
 </script>
 </body>
 </html>
